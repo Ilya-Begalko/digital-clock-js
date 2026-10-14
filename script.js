@@ -1,36 +1,54 @@
-const mainContainer = document.querySelector('.main-container');
-const sliderMainContainers = Array.from(document.querySelectorAll('.slider-main-container'));
 const sliders = Array.from(document.querySelectorAll('.slider-main-container .slider-container'));
 const magnifierSliders = Array.from(document.querySelectorAll('.slider-magnifier-container .slider-container'));
+const sizeProbe = document.querySelector('.slider-main-container');
 
 function padNumberWithZero(i) {
-  return i < 10 ? '0' + i : i;
-};
+  return String(i).padStart(2, '0');
+}
 
-setInterval(() => {
+function getDigitStep() {
+  const sample = document.querySelector('.slider-main-container .nbr');
+  return sample ? sample.getBoundingClientRect().height : 0;
+}
+
+function readTimeDigits() {
   const currentDate = new Date();
   const hr = padNumberWithZero(currentDate.getHours());
-  const hrArr = Array.from("" + hr, Number);
   const mn = padNumberWithZero(currentDate.getMinutes());
-  const mnArr = Array.from("" + mn, Number);
   const sc = padNumberWithZero(currentDate.getSeconds());
-  const scArr = Array.from("" + sc, Number);
-  const timeArr = [...hrArr, ...mnArr, ...scArr];
-  
-  gsap.set('.main-container', {
-  autoAlpha: 1
-});
-  
+
+  return [...hr, ...mn, ...sc].map(Number);
+}
+
+function applyDigits(digits, animate) {
+  const step = getDigitStep();
+  if (!step || typeof gsap === 'undefined') return;
+
   sliders.forEach((slider, i) => {
-    gsap.timeline()
-      .to(slider, {
-        y: -75 * timeArr[i],
-        ease: 'Sine.easeInOut'
-      })
-      .to(magnifierSliders[i], {
-        y: -75 * timeArr[i],
-        ease: 'Sine.easeInOut'
-      }, 0);
+    const target = { y: -step * digits[i], ease: 'Sine.easeInOut' };
+
+    if (animate) {
+      gsap.timeline()
+        .to(slider, target)
+        .to(magnifierSliders[i], target, 0);
+    } else {
+      gsap.set(slider, { y: target.y });
+      gsap.set(magnifierSliders[i], { y: target.y });
+    }
   });
-  
-}, 1000)
+}
+
+let digits = readTimeDigits();
+
+function tick() {
+  digits = readTimeDigits();
+  gsap.set('.main-container', { autoAlpha: 1 });
+  applyDigits(digits, true);
+}
+
+setInterval(tick, 1000);
+
+if (sizeProbe && 'ResizeObserver' in window) {
+  const resizeObserver = new ResizeObserver(() => applyDigits(digits, false));
+  resizeObserver.observe(sizeProbe);
+}

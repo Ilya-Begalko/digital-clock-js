@@ -1,23 +1,41 @@
 @import url("https://fonts.googleapis.com/css2?family=Red+Hat+Mono:wght@400;500;600;700&display=swap");
 
+:root {
+  /* 3 columns (200) + 4 gaps (30) = 720 at the original 75px digit height */
+  --digit-h: min(75px, calc((100vw - 16px) * 75 / 720));
+  --digit-h: min(75px, calc(100dvh - 16px), calc((100vw - 16px) * 75 / 720));
+  --col-w: calc(var(--digit-h) * 200 / 75);
+  --gap: calc(var(--digit-h) * 30 / 75);
+  --slider-w: var(--digit-h);
+  --font-main: calc(var(--digit-h) * 35 / 75);
+  --font-mag: calc(var(--digit-h) * 45 / 75);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   height: 100vh;
+  height: 100dvh;
   margin: 0;
   padding: 0;
   background: #c5c5c5;
   display: flex;
   align-items: center;
+  justify-content: center;
   overflow: hidden;
 }
 
 .main-container {
   width: 100%;
-  height: 75px;
+  height: var(--digit-h);
   display: grid;
-  gap: 30px;
-  grid-template-columns: auto 200px 200px 200px auto;
+  gap: var(--gap);
+  grid-template-columns: auto var(--col-w) var(--col-w) var(--col-w) auto;
   position: relative;
-  opacity:0;
+  opacity: 0;
 }
 
 .slider-main-container,
@@ -25,19 +43,18 @@ body {
   display: flex;
   align-items: flex-start;
   font-family: "Red Hat Mono", monospace;
-  font-size: 35px;
+  font-size: var(--font-main);
   color: #525252;
-  width: 200px;
-  height: 75px;
-  position: relative;
+  width: var(--col-w);
+  height: var(--digit-h);
   top: 0;
   position: absolute;
 }
 .slider-magnifier-container {
   font-weight: 800;
-  font-size: 45px;
+  font-size: var(--font-mag);
   overflow: hidden;
-  height: 75px;
+  height: var(--digit-h);
 }
 
 .hr {
@@ -59,7 +76,7 @@ body {
 }
 
 .slider {
-  width: 75px;
+  width: var(--slider-w);
   text-align: center;
   position: absolute;
 }
@@ -72,5 +89,5 @@ body {
 
 p {
   margin: 0;
-  line-height: 75px;
+  line-height: var(--digit-h);
 }
